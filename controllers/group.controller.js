@@ -2,7 +2,7 @@ const router = require(`express`).Router();
 
 const Group = require("../models/group.model");
 
-// const validaSession = require("../middleware/validate-session");
+// const validateSession = require("../middleware/validate-session");
 
 /* 
 Route: localhost:4000/group/add
@@ -47,7 +47,7 @@ router.delete("/delete/:id", async (req, res) => {
         res.json({message:
             group.deletedCount === 1
             ? "Successfully deleted group"
-            : "Error, group not found",
+            : "Error, group not found", group
         });
     } catch (error) {
         res.status(500),json({
