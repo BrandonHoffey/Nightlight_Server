@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
+const userController = require("./controllers/user.controller");
 
 const PORT = process.env.PORT;
 const DB_NAME = process.env.DB_NAME;
@@ -18,6 +19,7 @@ db.once("open", () => {
 // ! Connect Our Routes
 app.use(cors());
 app.use(express.json());
+app.use("/user", userController);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}`);
