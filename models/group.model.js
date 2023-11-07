@@ -9,7 +9,8 @@ const GroupSchema = new mongoose.Schema ({
         type: Array,
     },
     created_at: {
-        type: Date.now(),
+        type: Date,
+        default: Date.now,
     }
 })
 

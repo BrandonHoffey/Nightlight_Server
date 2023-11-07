@@ -14,7 +14,8 @@ const FriendSchema = new mongoose.Schema ({
         default: "sent"
     },
     created_at: {
-        type: Date.now(),
+        type: Date,
+        default: Date.now,
     }
 })
 
