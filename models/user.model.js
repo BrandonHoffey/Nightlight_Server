@@ -31,6 +31,10 @@ const UserSchema = new mongoose.Schema({
   status: {
     type: String,
   },
+  admin: {
+    type: Boolean,
+    default: false
+  },
   created_at: {
     type: Date,
     default: Date.now,
