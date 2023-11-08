@@ -2,7 +2,6 @@ const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
-const Group = require("../models/group.model");
 const validateSession = require("../middleware/validate-session");
 
 router.post("/sign-up", async (req, res) => {
@@ -49,41 +48,13 @@ router.post("/sign-in", async (req, res) => {
   }
 });
 
-router.get("/view-all/accounts", validateSession, async (req, res) => {
+router.get("/view-all", validateSession, async (req, res) => {
   try {
     const users = await User.find();
     if (!users) throw new Error("Users not found");
     res.json({
       message: "Viewing all successfully",
       users,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get("/view-all/groups", validateSession, async (req, res) => {
-  try {
-    const id = req.user.id;
-    const allGroups = await Group.find();
-    const groups = allGroups.filter((group) => group.users.includes(id));
-    res.json({
-      message: "Viewing all successfully",
-      groups,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get("/view-all/friends", validateSession, async (req, res) => {
-  try {
-    const id = req.user.id;
-    const allGroups = await Group.find();
-    const groups = allGroups.filter((group) => group.users.includes(id));
-    res.json({
-      message: "Viewing all successfully",
-      groups,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
