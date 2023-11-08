@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Friend = require("../models/friend.model");
+
 const validateSession = require("../middleware/validate-session");
 const User = require("../models/user.model");
 

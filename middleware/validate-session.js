@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 
-const router = require("../controllers/user.controller");
+// const router = require("../controllers/user.controller");
 
 const validateSession = async (req, res, next) => {
     try {
