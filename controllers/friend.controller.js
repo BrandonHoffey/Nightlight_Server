@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const Friend = require("../models/friend.model");
-const User = require("../models/user.model");
+
 const validateSession = require("../middleware/validate-session");
+const User = require("../models/user.model");
 
 router.post("/add", validateSession, async (req, res) => {
   try {
