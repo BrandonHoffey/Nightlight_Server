@@ -1,7 +1,9 @@
 const router = require(`express`).Router();
 const Group = require("../models/group.model");
+const validateSession = require("../middleware/validate-session");
+const validateAdmin = require("../middleware/validate-admin");
+const User = require("../models/user.model");
 
-const validaSession = require("../middleware/validate-session");
 
 /* 
 Route: localhost:4000/group/add
@@ -12,8 +14,7 @@ Description: Create a new group chat with multiple users
 router.post("/add", async (req, res) => {
   try {
     console.log("req.user", req.user);
-    const { name, users, created_at } = req.body;
-
+    const { name, users } = req.body;
     const group = new Group({
       name: name,
       users: users,
@@ -35,7 +36,7 @@ Type: DELETE
 Description: Delete a group from the database by it's id
 */
 
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/delete/:id", validateSession, async (req, res) => {
   try {
     const id = req.params.id;
     const conditions = {
@@ -48,6 +49,7 @@ router.delete("/delete/:id", async (req, res) => {
         group.deletedCount === 1
           ? "Successfully deleted group"
           : "Error, group not found",
+      group,
     });
   } catch (error) {
     res.status(500),
@@ -74,10 +76,11 @@ router.get("/viewAll", validaSession, async (req, res) => {
   }
 });
 
-router.patch("/update/:id", async (req, res) => {
+router.patch("/update/:id", validateSession, async (req, res) => {
   try {
     const id = req.params.id;
-    const conditions = { _id: id };
+    // const admin = req.user.admin;
+    const conditions = {$or: [{_id: id}, {admin: true}] };
     const data = req.body;
     const options = { new: true };
 
