@@ -4,6 +4,7 @@ const validateSession = require("../middleware/validate-session");
 const validateAdmin = require("../middleware/validate-admin");
 const User = require("../models/user.model");
 
+
 /* 
 Route: localhost:4000/group/add
 Request Type: POST
@@ -14,7 +15,6 @@ router.post("/add", async (req, res) => {
   try {
     console.log("req.user", req.user);
     const { name, users } = req.body;
-
     const group = new Group({
       name: name,
       users: users,
@@ -65,7 +65,7 @@ Type: GET
 Description: View all current rooms in the database
 */
 
-router.get("/viewAll", async (req, res) => {
+router.get("/viewAll", validaSession, async (req, res) => {
   try {
     const groups = await Group.find().populate("name", "users");
     res.json({ message: "Showing all groups", groups: groups });

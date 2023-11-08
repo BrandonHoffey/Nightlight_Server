@@ -5,6 +5,7 @@ const app = express();
 const mongoose = require("mongoose");
 const groupController = require("./controllers/group.controller");
 const userController = require("./controllers/user.controller");
+const messageController = require("./controllers/message.controller");
 const friendController = require("./controllers/friend.controller");
 
 /* Trying Socket.io */
@@ -27,6 +28,7 @@ server.listen(3000, () => {
   console.log('listening on *:3000');
 });
 
+
 const PORT = process.env.PORT;
 const DB_NAME = process.env.DB_NAME;
 const DB_URL = process.env.DB_URL;
@@ -43,6 +45,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/group", groupController);
 app.use("/user", userController);
+app.use("/message", messageController);
 app.use("/friend", friendController)
 
 

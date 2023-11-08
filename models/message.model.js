@@ -5,7 +5,7 @@ const MessageSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
-  reciever: {
+  receiver: {
     type: String,
     require: true,
   },
@@ -16,6 +16,10 @@ const MessageSchema = new mongoose.Schema({
   created_at: {
     type: Date,
     default: Date.now,
+  },
+  edited_at: {
+    type: Date,
+    default: null,
   },
 });
 
