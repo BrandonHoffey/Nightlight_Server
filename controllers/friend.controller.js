@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const Friend = require("../models/friend.model");
-const validaSession = require("../middleware/validate-session");
 const User = require("../models/user.model");
 const validateSession = require("../middleware/validate-session");
 
@@ -24,7 +23,7 @@ router.post("/add", validateSession, async (req, res) => {
   }
 });
 
-router.get("/view-all", validaSession, async (req, res) => {
+router.get("/view-all", validateSession, async (req, res) => {
   try {
     const id = req.user.id;
     const conditions = {
@@ -39,7 +38,7 @@ router.get("/view-all", validaSession, async (req, res) => {
   }
 });
 
-router.get("/friend-requests", validaSession, async (req, res) => {
+router.get("/friend-requests", validateSession, async (req, res) => {
   try {
     const id = req.user.id;
     const conditions = {
@@ -54,7 +53,7 @@ router.get("/friend-requests", validaSession, async (req, res) => {
   }
 });
 
-router.delete("/delete/:id", validaSession, async (req, res) => {
+router.delete("/delete/:id", validateSession, async (req, res) => {
   try {
     const id = req.params.id;
     const user = req.user.id;
@@ -77,7 +76,7 @@ router.delete("/delete/:id", validaSession, async (req, res) => {
   }
 });
 
-router.patch("/accept/:id", validaSession, async function (req, res) {
+router.patch("/accept/:id", validateSession, async function (req, res) {
   try {
     const id = req.params.id;
     const data = req.body;
