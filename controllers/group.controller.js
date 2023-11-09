@@ -65,7 +65,7 @@ Type: GET
 Description: View all current rooms in the database
 */
 
-router.get("/viewAll", validaSession, async (req, res) => {
+router.get("/viewAll", validateSession, async (req, res) => {
   try {
     const groups = await Group.find().populate("name", "users");
     res.json({ message: "Showing all groups", groups: groups });
