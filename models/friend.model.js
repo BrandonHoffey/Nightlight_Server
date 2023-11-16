@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const FriendSchema = new mongoose.Schema({
   user: {
     type: String,
-    require: true,
+    required: true,
   },
   friend: {
     type: String,
-    require: true,
+    required: true,
   },
   status: {
     type: String,
@@ -18,6 +18,5 @@ const FriendSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
 
 module.exports = mongoose.model("Friend", FriendSchema);
