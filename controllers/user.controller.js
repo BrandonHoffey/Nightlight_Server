@@ -12,6 +12,9 @@ router.post("/sign-up", async (req, res) => {
       displayName,
       email,
       password: bcrypt.hashSync(password, 12),
+      sentFriendRequests: [],
+      friendRequests: [],
+      friends: [],
     });
     const newUser = await user.save();
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
