@@ -6,11 +6,18 @@ const validateSession = require("../middleware/validate-session");
 
 router.post("/sign-up", async (req, res) => {
   try {
-    const { username, displayName, email, password } = req.body;
+    const { username, email, password } = req.body;
+    if (username.length === 0) {
+      return res.status(422).json({ error: "Please input a username" });
+    } else if (email.length === 0) {
+      return res.status(422).json({ error: "Please input a email" });
+    } else if (password.length === 0) {
+      return res.status(422).json({ error: "Please input a password" });
+    }
     const user = new User({
-      username,
-      displayName,
-      email,
+      username: username.toLowerCase(),
+      displayName: username,
+      email: email.toLowerCase(),
       password: bcrypt.hashSync(password, 12),
       sentFriendRequests: [],
       friendRequests: [],
@@ -34,9 +41,12 @@ router.post("/sign-in", async (req, res) => {
   try {
     const { username, email, password } = req.body;
     const user = await User.findOne({ $or: [{ email }, { username }] });
+    if (!user) {
+      return res.status(401).json({ error: "Incorrect username or email." });
+    }
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
-      throw new Error("Password or Email is incorrect");
+      return res.status(401).json({ error: "Incorrect password." });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: 7 * 24 * 60 * 60,
@@ -54,7 +64,10 @@ router.post("/sign-in", async (req, res) => {
 router.get("/view-all", validateSession, async (req, res) => {
   try {
     const users = await User.find();
-    if (!users) throw new Error("Users not found");
+    if (!users || users.length === 0) {
+      throw new Error("Users not found");
+    }
+
     res.json({
       message: "Viewing all successfully",
       users,
