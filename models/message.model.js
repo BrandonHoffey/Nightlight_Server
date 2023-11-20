@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const MessageSchema = new mongoose.Schema({
   sender: {
     type: String,
-    require: true,
+    required: true,
   },
-  reciever: {
+  receiver: {
     type: String,
-    require: true,
+    required: true,
   },
   content: {
     type: String,
@@ -16,6 +16,10 @@ const MessageSchema = new mongoose.Schema({
   created_at: {
     type: Date,
     default: Date.now,
+  },
+  edited_at: {
+    type: Date,
+    default: null,
   },
 });
 
