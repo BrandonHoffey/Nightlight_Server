@@ -50,6 +50,24 @@ router.get("/view-all", validateSession, async (req, res) => {
   }
 });
 
+router.get("/view-all-details", validateSession, async (req, res) => {
+  try {
+    const id = req.user.id;
+    const user = await User.findById(id);
+    const friendsList = user.friends;
+    const projection = {
+      username: 1,
+      displayName: 1,
+      profilePicture: 1,
+    };
+    const friends = await User.find({ _id: { $in: friendsList } }, projection);
+    res.json({ message: "Viewing friends profiles", friends });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 router.get("/friend-requests/:userId", validateSession, async (req, res) => {
   try {
     const { userId } = req.params;
