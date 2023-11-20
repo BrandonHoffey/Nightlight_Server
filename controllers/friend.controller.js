@@ -5,6 +5,7 @@ const validateSession = require("../middleware/validate-session");
 const User = require("../models/user.model");
 const { request } = require("express");
 
+// Router to Send a request
 router.post("/add", validateSession, async (req, res) => {
   const { currentUserId, selectedUserId } = req.body;
   try {
