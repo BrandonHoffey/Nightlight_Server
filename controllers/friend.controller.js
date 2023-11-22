@@ -142,7 +142,7 @@ router.get("/friend-requests/sent/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findById(userId)
-      .populate("sentFriendrequests", "username profilePicture")
+      .populate("sentFriendRequests", "username profilePicture")
       .lean();
 
     const sentFriendRequests = user.sentFriendRequests;
