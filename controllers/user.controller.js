@@ -135,4 +135,34 @@ router.delete("/delete-account", validateSession, async (req, res) => {
   }
 });
 
+router.patch("/update-status/:id", validateSession, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const { status } = req.body;
+
+    if (status === undefined || status === "") {
+      return res.status(422).json({ error: "Please provide a valid status" });
+    }
+
+    const conditions = { _id: userId };
+    const updateData = { status };
+    const options = { new: true };
+
+    const userUpdate = await User.findOneAndUpdate(conditions, updateData, options);
+
+    if (!userUpdate) {
+      throw new Error("User not found");
+    }
+
+    res.json({
+      message: "User Status Updated Successfully",
+      user: userUpdate,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 module.exports = router;
