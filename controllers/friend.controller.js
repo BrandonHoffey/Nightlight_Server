@@ -5,6 +5,7 @@ const validateSession = require("../middleware/validate-session");
 const User = require("../models/user.model");
 const { request } = require("express");
 
+// Router to Send a request
 router.post("/add", validateSession, async (req, res) => {
   const { currentUserId, selectedUserId } = req.body;
   try {
@@ -30,17 +31,16 @@ router.post("/add", validateSession, async (req, res) => {
 
 router.get("/view-all", validateSession, async (req, res) => {
   try {
-    const id = req.user.id;
-    const user = await User.findById(id);
-    const friendsList = user.friends;
-    let friends = friendsList.map(
-      async (friend) =>
-        await User.findById(friend).select(
-          "_id username displayName profilePicture status friends"
-        )
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const friendIds = user.friends || [];
+    const friends = await User.find({ _id: { $in: friendIds } }).select(
+      "_id username displayName profilePicture status friends"
     );
-    friends = await Promise.all(friends);
-    res.json({ message: "viewing all friends", friends });
+    res.json({ message: "Viewing all friends", friends });
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -132,6 +132,42 @@ router.post("/friend-request/accept", validateSession, async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+router.get("/friend-requests/sent/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId)
+      .populate("sentFriendRequests", "username profilePicture")
+      .lean();
+
+    const sentFriendRequests = user.sentFriendRequests;
+
+    res.json(sentFriendRequests);
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ error: "Internal Server" });
+  }
+});
+
+router.get("/friends/:userId", (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    User.findById(userId)
+      .populate("friends")
+      .then((user) => {
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+        const friendIds = user.friends.map((friend) => friend._id);
+
+        res.status(200).json(friendIds);
+      });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "internal server error" });
   }
 });
 

@@ -30,6 +30,7 @@ const UserSchema = new mongoose.Schema({
   },
   status: {
     type: String,
+    default: "offline",
   },
   admin: {
     type: Boolean,
