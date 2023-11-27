@@ -32,7 +32,14 @@ router.get("/view-all", validateSession, async (req, res) => {
   try {
     const id = req.user.id;
     const user = await User.findById(id);
-    const friends = user.friends;
+    const friendsList = user.friends;
+    let friends = friendsList.map(
+      async (friend) =>
+        await User.findById(friend).select(
+          "_id username displayName profilePicture status friends"
+        )
+    );
+    friends = await Promise.all(friends);
     res.json({ message: "viewing all friends", friends });
   } catch (error) {
     res.status(500).json({

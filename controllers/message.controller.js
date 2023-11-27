@@ -3,23 +3,26 @@ const Message = require("../models/message.model");
 const User = require("../models/user.model");
 const Group = require("../models/group.model");
 const validateSession = require("../middleware/validate-session");
-const { compare } = require("bcrypt");
 
 router.get("/:id/view", validateSession, async (req, res) => {
   try {
     const id = req.params.id;
+    const userId = req.user.id;
     const group = await Group.findById(id);
     const user = await User.findById(id);
     if (!group && !user) {
       throw new Error("No Group Or User Found");
     }
-    const conditions = { receiver: id };
+    const conditions = {
+      $or: [
+        { $and: [{ receiver: id, sender: userId }] },
+        { $and: [{ receiver: userId, sender: id }] },
+      ],
+    };
     const message = await Message.find(conditions);
     res.json({
       message: "Viewing Messages Successfully",
       messages: message,
-      user,
-      group,
     });
   } catch (error) {
     res.json({ error: error.message });
@@ -73,6 +76,28 @@ router.delete("/:id/delete", validateSession, async (req, res) => {
     deleteMessage.deletedCount === 0
       ? res.json({ message: "Deleted Message Unsuccessfully" })
       : res.json({ message: "Deleted Message Successfully" });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+router.get("/:id/latest", validateSession, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const userId = req.user.id;
+    const conditions = {
+      $or: [
+        { $and: [{ receiver: id, sender: userId }] },
+        { $and: [{ receiver: userId, sender: id }] },
+      ],
+    };
+    const latestMessage = await Message.find(conditions)
+      .sort({ created_at: -1 })
+      .limit(1);
+    res.json({
+      message: "Latest Message Viewing Unsuccessfully",
+      latestMessage,
+    });
   } catch (error) {
     res.json({ error: error.message });
   }

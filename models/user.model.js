@@ -13,8 +13,7 @@ const UserSchema = new mongoose.Schema({
   },
   profilePicture: {
     type: String,
-    default:
-      "https://plus.unsplash.com/premium_photo-1669905375079-5d7e074fc123?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cGVhcnxlbnwwfHwwfHx8MA%3D%3D",
+    default: "https://i.ibb.co/0qJhTbq/blankpfp.jpg",
   },
   email: {
     type: String,
@@ -44,18 +43,24 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
-  sentFriendRequests: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  }],
-  friendRequests: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  }],
-  friends: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  }],
+  sentFriendRequests: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  friendRequests: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  friends: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 module.exports = mongoose.model("User", UserSchema);

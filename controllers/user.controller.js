@@ -111,4 +111,25 @@ router.delete("/delete-account", validateSession, async (req, res) => {
   }
 });
 
+router.get("/current-account", validateSession, async (req, res) => {
+  try {
+    const id = req.user.id;
+    const user = await User.findById(id);
+    if (!user) {
+      // Log the error and send a 404 response
+      console.error("User not found");
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({
+      message: "Account Viewing Successfully",
+      user,
+    });
+  } catch (error) {
+    // Log the error for debugging purposes
+    console.error("Error fetching user account:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
