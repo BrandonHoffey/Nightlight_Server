@@ -77,7 +77,7 @@ module.exports = (io, socket) => {
   const inboxUpdate = async (user) => {
     try {
       const userId = user.user._id;
-      const conditions = { users: { $in: [userId] } };
+      const conditions = { users: { $elemMatch: { _id: userId } } };
       const userFriends = await User.findById(userId).populate(
         "friends",
         "_id username displayName profilePicture status"
