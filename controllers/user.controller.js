@@ -87,9 +87,15 @@ router.patch("/edit-account/:id", validateSession, async (req, res) => {
     }
 
     const updateData = {};
-    const allowedFields = ["username", "displayName", "email", "password", "profilePicture"];
+    const allowedFields = [
+      "username",
+      "displayName",
+      "email",
+      "password",
+      "profilePicture",
+    ];
 
-    allowedFields.forEach(field => {
+    allowedFields.forEach((field) => {
       if (req.body[field] !== undefined && req.body[field] !== "") {
         if (field === "password") {
           updateData[field] = bcrypt.hashSync(req.body[field], 12);
@@ -102,7 +108,11 @@ router.patch("/edit-account/:id", validateSession, async (req, res) => {
     const conditions = { _id: targetUserId };
     const options = { new: true };
 
-    const userUpdate = await User.findOneAndUpdate(conditions, updateData, options);
+    const userUpdate = await User.findOneAndUpdate(
+      conditions,
+      updateData,
+      options
+    );
 
     if (!userUpdate) {
       throw new Error("User not found");
@@ -149,7 +159,11 @@ router.patch("/update-status/:id", validateSession, async (req, res) => {
     const updateData = { status };
     const options = { new: true };
 
-    const userUpdate = await User.findOneAndUpdate(conditions, updateData, options);
+    const userUpdate = await User.findOneAndUpdate(
+      conditions,
+      updateData,
+      options
+    );
 
     if (!userUpdate) {
       throw new Error("User not found");
@@ -162,6 +176,27 @@ router.patch("/update-status/:id", validateSession, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/current-account", validateSession, async (req, res) => {
+  try {
+    const id = req.user.id;
+    const user = await User.findById(id);
+    if (!user) {
+      // Log the error and send a 404 response
+      console.error("User not found");
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({
+      message: "Account Viewing Successfully",
+      user,
+    });
+  } catch (error) {
+    // Log the error for debugging purposes
+    console.error("Error fetching user account:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
