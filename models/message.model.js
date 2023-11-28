@@ -5,7 +5,23 @@ const MessageSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  senderName: {
+    type: String,
+    required: true,
+  },
+  senderPicture: {
+    type: String,
+    required: true,
+  },
   receiver: {
+    type: String,
+    required: true,
+  },
+  receiverName: {
+    type: String,
+    required: true,
+  },
+  receiverPicture: {
     type: String,
     required: true,
   },

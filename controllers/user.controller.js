@@ -77,20 +77,54 @@ router.get("/view-all", validateSession, async (req, res) => {
   }
 });
 
-router.patch("/edit-account", validateSession, async (req, res) => {
+router.patch("/edit-account/:id", validateSession, async (req, res) => {
   try {
-    const id = req.user.id;
-    const data = req.body;
-    const conditions = { _id: id };
+    const authenticatedUserId = req.user.id;
+    const targetUserId = req.params.id;
+
+    if (authenticatedUserId !== targetUserId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    const updateData = {};
+    const allowedFields = [
+      "username",
+      "displayName",
+      "email",
+      "password",
+      "profilePicture",
+    ];
+
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined && req.body[field] !== "") {
+        if (field === "password") {
+          updateData[field] = bcrypt.hashSync(req.body[field], 12);
+        } else {
+          updateData[field] = req.body[field];
+        }
+      }
+    });
+
+    const conditions = { _id: targetUserId };
     const options = { new: true };
-    const userUpdate = await User.findOneAndUpdate(conditions, data, options);
-    if (!userUpdate) throw new Error("User not found");
+
+    const userUpdate = await User.findOneAndUpdate(
+      conditions,
+      updateData,
+      options
+    );
+
+    if (!userUpdate) {
+      throw new Error("User not found");
+    }
+
     res.json({
       message: "Account Updated Successfully",
       user: userUpdate,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -107,6 +141,61 @@ router.delete("/delete-account", validateSession, async (req, res) => {
       user: userDelete,
     });
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.patch("/update-status/:id", validateSession, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const { status } = req.body;
+
+    if (status === undefined || status === "") {
+      return res.status(422).json({ error: "Please provide a valid status" });
+    }
+
+    const conditions = { _id: userId };
+    const updateData = { status };
+    const options = { new: true };
+
+    const userUpdate = await User.findOneAndUpdate(
+      conditions,
+      updateData,
+      options
+    );
+
+    if (!userUpdate) {
+      throw new Error("User not found");
+    }
+
+    res.json({
+      message: "User Status Updated Successfully",
+      user: userUpdate,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/current-account", validateSession, async (req, res) => {
+  try {
+    const id = req.user.id;
+    const user = await User.findById(id);
+    if (!user) {
+      // Log the error and send a 404 response
+      console.error("User not found");
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({
+      message: "Account Viewing Successfully",
+      user,
+    });
+  } catch (error) {
+    // Log the error for debugging purposes
+    console.error("Error fetching user account:", error);
     res.status(500).json({ error: error.message });
   }
 });

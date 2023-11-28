@@ -32,17 +32,14 @@ router.post("/add", validateSession, async (req, res) => {
 router.get("/view-all", validateSession, async (req, res) => {
   try {
     const userId = req.user.id;
-
     const user = await User.findById(userId);
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
     const friendIds = user.friends || [];
-
-    const friends = await User.find({ _id: { $in: friendIds } });
-
+    const friends = await User.find({ _id: { $in: friendIds } }).select(
+      "_id username displayName profilePicture status friends"
+    );
     res.json({ message: "Viewing all friends", friends });
   } catch (error) {
     res.status(500).json({
@@ -142,7 +139,7 @@ router.get("/friend-requests/sent/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findById(userId)
-      .populate("sentFriendrequests", "username profilePicture")
+      .populate("sentFriendRequests", "username profilePicture")
       .lean();
 
     const sentFriendRequests = user.sentFriendRequests;
