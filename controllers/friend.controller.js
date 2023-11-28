@@ -72,7 +72,7 @@ router.get("/friend-requests/:userId", validateSession, async (req, res) => {
 
     //fetch the user document based on the User Id
     const user = await User.findById(userId)
-      .populate("friendRequests", "username profilePicture")
+      .populate("friendRequests", "username profilePicture displayName")
       .lean();
     const friendRequests = user.friendRequests;
     res.json({ message: "Viewing all requests", friendRequests });
@@ -170,5 +170,7 @@ router.get("/friends/:userId", (req, res) => {
     res.status(500).json({ message: "internal server error" });
   }
 });
+
+
 
 module.exports = router;
