@@ -74,6 +74,31 @@ module.exports = (io, socket) => {
     }
   };
 
+  const inboxUpdate = async (user) => {
+    try {
+      const userId = user.user._id;
+      const conditions = { users: { $elemMatch: { _id: userId } } };
+      const userFriends = await User.findById(userId).populate(
+        "friends",
+        "_id username displayName profilePicture status"
+      );
+      const userGroups = await Group.find(conditions);
+      console.log(userGroups);
+      if (userFriends || userGroups) {
+        const data = [];
+        userFriends?.friends?.forEach((friend) => data.push(friend));
+        userGroups?.forEach((group) => data.push(group));
+        socket.join(userId);
+        io.to(userId).emit("inboxUpdate", data);
+      } else {
+        console.log("User not found");
+        io.to(userId).emit("userNotFound");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // const getMessages = async (user) => {
   //   try {
   //     const receiver = user.receiver;
@@ -88,7 +113,8 @@ module.exports = (io, socket) => {
   //   }
   // };
 
+  socket.on("message", messageSent);
   socket.on("status", status);
   socket.on("statusUpdate", updateStatus);
-  socket.on("message", messageSent);
+  socket.on("inboxUpdate", inboxUpdate);
 };
