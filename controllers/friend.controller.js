@@ -38,7 +38,7 @@ router.get("/view-all", validateSession, async (req, res) => {
     }
     const friendIds = user.friends || [];
     const friends = await User.find({ _id: { $in: friendIds } }).select(
-      "_id username displayName profilePicture status friends"
+      "_id username displayName profilePicture status"
     );
     res.json({ message: "Viewing all friends", friends });
   } catch (error) {
