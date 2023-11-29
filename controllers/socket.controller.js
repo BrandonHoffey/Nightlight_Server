@@ -6,6 +6,9 @@ module.exports = (io, socket) => {
   const messageSent = async (msg) => {
     const roomName = getRoomName(msg.sender, msg.receiver);
     try {
+      const isGroup = await Group.findById(msg.receiver);
+      const isUser = await User.findById(msg.receiver);
+
       const message = new Message({
         sender: msg.sender,
         senderName: msg.senderName,
@@ -17,7 +20,21 @@ module.exports = (io, socket) => {
       });
       socket.join(roomName);
       const newMessage = await message.save();
-      io.to(roomName).emit("message", newMessage);
+      if (isGroup) {
+        const group = isGroup;
+        const isSenderInGroup = group.users.some(
+          (user) => user._id === msg.sender
+        );
+        if (isSenderInGroup) {
+          io.to(roomName).emit("groupMessage", newMessage);
+        } else {
+          console.log("Sender is not a member of the group");
+        }
+      }
+
+      if (isUser) {
+        io.to(roomName).emit("message", newMessage);
+      }
       console.log(msg);
     } catch (error) {
       console.error(error);
@@ -25,7 +42,7 @@ module.exports = (io, socket) => {
   };
 
   function getRoomName(senderId, receiverId) {
-    return `room_${Math.min(senderId, receiverId)}_${Math.max(
+    return `user_${Math.min(senderId, receiverId)}_${Math.max(
       senderId,
       receiverId
     )}`;
@@ -82,12 +99,15 @@ module.exports = (io, socket) => {
         "friends",
         "_id username displayName profilePicture status"
       );
-      const userGroups = await Group.find(conditions);
+      const userGroups = await Group.find(conditions).select(
+        "_id name groupPicture users"
+      );
       console.log(userGroups);
       if (userFriends || userGroups) {
         const data = [];
         userFriends?.friends?.forEach((friend) => data.push(friend));
         userGroups?.forEach((group) => data.push(group));
+        console.log(data);
         socket.join(userId);
         io.to(userId).emit("inboxUpdate", data);
       } else {

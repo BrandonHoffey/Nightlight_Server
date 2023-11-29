@@ -4,13 +4,12 @@ const User = require("../models/user.model");
 const Group = require("../models/group.model");
 const validateSession = require("../middleware/validate-session");
 
-router.get("/:id/view", validateSession, async (req, res) => {
+router.get("/:id/view-user", validateSession, async (req, res) => {
   try {
     const id = req.params.id;
     const userId = req.user.id;
-    const group = await Group.findById(id);
     const user = await User.findById(id);
-    if (!group && !user) {
+    if (!user) {
       throw new Error("No Group Or User Found");
     }
     const conditions = {
@@ -18,6 +17,26 @@ router.get("/:id/view", validateSession, async (req, res) => {
         { $and: [{ receiver: id, sender: userId }] },
         { $and: [{ receiver: userId, sender: id }] },
       ],
+    };
+    const message = await Message.find(conditions);
+    res.json({
+      message: "Viewing Messages Successfully",
+      messages: message,
+    });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+router.get("/:id/view-group", validateSession, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const group = await Group.findById(id);
+    if (!group) {
+      throw new Error("No Group Or User Found");
+    }
+    const conditions = {
+      receiver: id,
     };
     const message = await Message.find(conditions);
     res.json({
