@@ -182,9 +182,10 @@ router.patch("/update-status/:id", validateSession, async (req, res) => {
 router.get("/current-account", validateSession, async (req, res) => {
   try {
     const id = req.user.id;
-    const user = await User.findById(id);
+    const user = await User.findById(id).select(
+      "_id username displayName profilePicture status sentFriendRequests friendRequests friends"
+    );
     if (!user) {
-      // Log the error and send a 404 response
       console.error("User not found");
       return res.status(404).json({ error: "User not found" });
     }
@@ -199,7 +200,5 @@ router.get("/current-account", validateSession, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-
 
 module.exports = router;
