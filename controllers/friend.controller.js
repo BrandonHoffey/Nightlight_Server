@@ -135,6 +135,26 @@ router.post("/friend-request/accept", validateSession, async (req, res) => {
   }
 });
 
+router.post("/friend-request/decline", validateSession, async (req, res) => {
+  try {
+    const { senderId, recipientId } = req.body;
+
+    // Retrieve the documents of sender and the recipient
+    const recipient = await User.findById(recipientId);
+
+    recipient.friendRequests = recipient.friendRequests.filter(
+      (request) => request.toString() !== senderId.toString()
+    );
+
+    await recipient.save();
+
+    res.status(200).json({ message: "Friend Request Declined Successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 router.get("/friend-requests/sent/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
@@ -170,5 +190,7 @@ router.get("/friends/:userId", (req, res) => {
     res.status(500).json({ message: "internal server error" });
   }
 });
+
+
 
 module.exports = router;
